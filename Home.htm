@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zeyad Movie</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    header {
+      background-color: #333;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    #search {
+      padding: 10px;
+      width: 300px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    header button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: green;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    header button:hover {
+      background-color: #ff3c3c;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .categories {
+      margin-bottom: 20px;
+    }
+
+    .category-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .category-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #444;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .category-btn.active {
+      background-color: green;
+    }
+
+    .category-btn:hover {
+      background-color: red;
+    }
+
+    .movies .movie-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .movie-card {
+      background-color: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .movie-card h3 {
+      margin: 10px 0;
+      font-size: 1.2rem;
+    }
+
+    .movie-card p {
+      margin: 5px 0;
+      color: #aaa;
+    }
+
+    .movie-card .favorite-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: green;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .movie-card .favorite-btn:hover {
+      background-color: #e50914;
+    }
+
+    .movie-card .favorite-btn.active {
+      background-color: black;
+    }
+
+    .movie-card .download-btn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: green;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .movie-card .download-btn:hover {
+      background-color: red;
+    }
+
+    /* Star Rating Styles */
+    .star-rating {
+      display: flex;
+      gap: 5px;
+      margin: 10px 0;
+      justify-content: center;
+    }
+
+    .star {
+      cursor: pointer;
+      font-size: 24px;
+      color: #ccc;
+      transition: color 0.2s ease;
+    }
+
+    .star:hover,
+    .star.active {
+      color: #ffcc00;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .modal .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .favorites-list, .download-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .favorite-item, .download-item {
+      background-color: #444;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .favorite-item:hover, .download-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .favorite-item h3, .download-item h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .favorite-item p, .download-item p {
+      margin: 5px 0;
+      color: #aaa;
+    }
+
+    .favorite-item .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #e50914;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+
+    .favorite-item .delete-btn:hover {
+      background-color: #ff3c3c;
+    }
+
+    #download-all-favorites {
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #download-all-favorites:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Zeyad Movies</h1>
+    <input type="text" id="search" placeholder="Search movies...">
+    <button id="view-favorites">View Favorites</button>
+  </header>
+
+  <main>
+    <section class="categories">
+      <h2>Categories</h2>
+      <div class="category-list">
+        <button class="category-btn active" data-category="all">All</button>
+        <button class="category-btn" data-category="Action">Action</button>
+        <button class="category-btn" data-category="Kids">Kids</button>
+        <button class="category-btn" data-category="Horror">Horror</button>
+      </div>
+    </section>
+
+    <section class="movies">
+      <h2>Popular Movies</h2>
+      <div class="movie-list" id="movie-list">
+        <!-- Movies will be dynamically added here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Favorites Modal -->
+  <div id="favorites-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Your Favorites</h2>
+      <button id="download-all-favorites">Download All Favorites</button>
+      <div class="favorites-list" id="favorites-list">
+        <!-- Favorite movies will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample movie data
+    const movies = [
+      {
+        title: "Venom 2018",
+        category: "Action",
+        image: "images/Venom(1).jpg",
+        detailsPage: "Venom 2018.html",
+        videoUrl: "Video/Venom.2018.720p.BRRip.HEVC.MkvCage.www.P30Day.com - Copy.mp4",
+      },
+      {
+        title: "Venom 2",
+        category: "Action",
+        image: "images/Venom(2).jpg",
+        detailsPage: "Venom_Let_There_Be_Carnage.html",
+      },
+      {
+        title: "Ratatouille",
+        category: "Kids",
+        image: "images/Ratatouille.jpg",
+        detailsPage: "Ratatouille.html",
+      },
+      {
+        title: "Car 1",
+        category: "Kids",
+        image: "images/Cars_2006.jpg",
+        detailsPage: "Car.html",
+        videoUrl: "videos/Cars_1.mp4",
+      },
+      {
+        title: "Spirit Stallion",
+        category: "Kids",
+        image: "images/Spirit Stallion.jpg",
+        detailsPage: "Spirit Stallion.html",
+      },
+      {
+        title: "l am the legend 1",
+        category: "Horror",
+        image: "images/l am the legend 1.jpg",
+        detailsPage: "l am the legend 1.html",
+      },
+      {
+        title: "🔜l am the legend 2",
+        category: "Horror",
+        image: "images/I Am Legend 2.jpg",
+        detailsPage: "#",
+      },
+    ];
+
+    // DOM Elements
+    const movieList = document.getElementById("movie-list");
+    const searchInput = document.getElementById("search");
+    const categoryButtons = document.querySelectorAll(".category-btn");
+    const viewFavoritesBtn = document.getElementById("view-favorites");
+    const favoritesModal = document.getElementById("favorites-modal");
+    const favoritesList = document.getElementById("favorites-list");
+    const closeModal = document.querySelector(".close");
+    const downloadAllFavoritesBtn = document.getElementById("download-all-favorites");
+
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    let ratings = JSON.parse(localStorage.getItem("ratings")) || {};
+
+    // Display all movies initially
+    displayMovies(movies);
+
+    // Filter movies by category
+    categoryButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const category = button.dataset.category;
+        const filteredMovies = category === "all" ? movies : movies.filter((movie) => movie.category === category);
+        displayMovies(filteredMovies);
+
+        // Update active button
+        categoryButtons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+      });
+    });
+
+    // Search functionality
+    searchInput.addEventListener("input", (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const filteredMovies = movies.filter((movie) => movie.title.toLowerCase().includes(searchTerm));
+      displayMovies(filteredMovies);
+    });
+
+    // Add to favorites
+    function addToFavorites(movie) {
+      if (!favorites.some((fav) => fav.title === movie.title)) {
+        favorites.push(movie);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        displayFavorites();
+      }
+    }
+
+    // Remove from favorites
+    function removeFromFavorites(movie) {
+      favorites = favorites.filter((fav) => fav.title !== movie.title);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      displayFavorites();
+    }
+
+    // Display favorites
+    function displayFavorites() {
+      favoritesList.innerHTML = favorites
+        .map(
+          (movie) => `
+          <div class="favorite-item">
+            <button class="delete-btn" onclick="removeFromFavoritesByTitle('${movie.title}')">×</button>
+            <h3>${movie.title}</h3>
+            <p>${movie.category}</p>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    // Remove from favorites by title
+    function removeFromFavoritesByTitle(title) {
+      const movie = movies.find((m) => m.title === title);
+      removeFromFavorites(movie);
+    }
+
+    // Open favorites modal
+    viewFavoritesBtn.addEventListener("click", () => {
+      favoritesModal.style.display = "flex";
+    });
+
+    // Close favorites modal
+    closeModal.addEventListener("click", () => {
+      favoritesModal.style.display = "none";
+    });
+
+    // Download video
+    function downloadVideo(videoUrl) {
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.download = videoUrl.split("/").pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Download all favorites
+    downloadAllFavoritesBtn.addEventListener("click", () => {
+      favorites.forEach((movie) => {
+        if (movie.videoUrl) {
+          downloadVideo(movie.videoUrl);
+        }
+      });
+    });
+
+    // Function to display movies
+    function displayMovies(movies) {
+      movieList.innerHTML = movies
+        .map(
+          (movie) => `
+          <div class="movie-card">
+            <a href="${movie.detailsPage}" target="_blank">
+              <img src="${movie.image}" alt="${movie.title}" onerror="this.src='placeholder.jpg';">
+            </a>
+            <h3>${movie.title}</h3>
+            <p>${movie.category}</p>
+            <div class="star-rating" data-movie-title="${movie.title}">
+              ${Array.from({ length: 5 }, (_, i) => `
+                <span class="star" data-rating="${i + 1}">&#9733;</span>
+              `).join("")}
+            </div>
+            <button class="favorite-btn" onclick="toggleFavorite(this, '${movie.title}')" aria-label="Add to favorites">
+              ${favorites.some(fav => fav.title === movie.title) ? '❤️' : '🤍'}
+            </button>
+          </div>
+        `
+        )
+        .join("");
+
+      // Initialize star ratings
+      initializeStarRatings();
+    }
+
+    // Toggle favorite
+    function toggleFavorite(button, title) {
+      const movie = movies.find((m) => m.title === title);
+      if (favorites.some((fav) => fav.title === title)) {
+        button.innerHTML = "🤍";
+        removeFromFavorites(movie);
+      } else {
+        button.innerHTML = "❤️";
+        addToFavorites(movie);
+      }
+    }
+
+    // Handle star clicks
+    function handleStarClick(event) {
+      const star = event.target;
+      const rating = parseInt(star.dataset.rating);
+      const movieTitle = star.closest(".star-rating").dataset.movieTitle;
+
+      // Save the rating
+      ratings[movieTitle] = rating;
+      localStorage.setItem("ratings", JSON.stringify(ratings));
+
+      // Update the star display
+      updateStars(movieTitle, rating);
+    }
+
+    // Update stars based on the selected rating
+    function updateStars(movieTitle, rating) {
+      const starRatingContainer = document.querySelector(`.star-rating[data-movie-title="${movieTitle}"]`);
+      const stars = starRatingContainer.querySelectorAll(".star");
+
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.add("active");
+        } else {
+          star.classList.remove("active");
+        }
+      });
+    }
+
+    // Initialize star ratings when the page loads
+    function initializeStarRatings() {
+      const starRatingContainers = document.querySelectorAll(".star-rating");
+      starRatingContainers.forEach((container) => {
+        const movieTitle = container.dataset.movieTitle;
+        const rating = ratings[movieTitle] || 0;
+        updateStars(movieTitle, rating);
+      });
+    }
+
+    // Attach event listeners to stars
+    document.addEventListener("click", (event) => {
+      if (event.target.classList.contains("star")) {
+        handleStarClick(event);
+      }
+    });
+
+    // Close modal on outside click
+    window.addEventListener("click", (event) => {
+      if (event.target === favoritesModal) {
+        favoritesModal.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
